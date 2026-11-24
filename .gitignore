@@ -1,0 +1,26 @@
+# Virtual environment
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Credentials
+.env
+.env.*
+
+# VS Code settings
+.vscode/
+
+# Logs and databases
+*.log
+*.db
+*.sqlite3
+
+# Testing cache
+.pytest_cache/
+
+# OS files
+.DS_Store
+Thumbs.db
