@@ -852,3 +852,350 @@
     padding: 8px 12px;
   }
 }
+
+/* =========================================
+   PERSISTENT CONVERSATION TOOLBAR
+   ========================================= */
+
+.persistent-chat-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 24px;
+  background: #0d1017;
+  border-bottom: 1px solid #252933;
+  flex-shrink: 0;
+}
+
+.persistent-chat-mode {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  color: #b9c9ff;
+}
+
+.persistent-chat-mode > svg {
+  flex-shrink: 0;
+}
+
+.persistent-chat-mode-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.persistent-chat-mode-text strong {
+  font-size: 12px;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.persistent-chat-mode-text span {
+  font-size: 11px;
+  color: #9299aa;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.persistent-chat-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+
+/* =========================================
+   SAVE HISTORY TOGGLE
+   ========================================= */
+
+.persistent-save-control {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+  color: #b0b7c6;
+  cursor: pointer;
+  user-select: none;
+}
+
+.persistent-save-control input {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+  background: #252a36;
+  border: 1px solid #3a4050;
+  border-radius: 20px;
+  position: relative;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.persistent-save-control input::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  top: 3px;
+  left: 3px;
+  border-radius: 50%;
+  background: #9299aa;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.persistent-save-control input:checked {
+  background: #b9c9ff;
+  border-color: #b9c9ff;
+}
+
+.persistent-save-control input:checked::after {
+  transform: translateX(16px);
+  background: #111520;
+}
+
+.persistent-save-control input:focus-visible {
+  outline: 2px solid #b9c9ff;
+  outline-offset: 4px;
+}
+
+.persistent-save-control input:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+
+/* =========================================
+   SAVED CONVERSATION PANEL
+   ========================================= */
+
+.persistent-history-panel {
+  padding: 18px 24px;
+  background: #0d1017;
+  border-bottom: 1px solid #252933;
+  flex-shrink: 0;
+  animation: appear 0.2s ease;
+}
+
+.persistent-history-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.persistent-history-heading strong {
+  color: #eef0f6;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.persistent-history-heading p {
+  margin: 5px 0 0;
+  font-size: 11px;
+  color: #9299aa;
+}
+
+.persistent-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  max-height: min(240px, 30vh);
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.persistent-history-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  background: #10131b;
+  border: 1px solid #252933;
+  border-radius: 9px;
+  color: #9299aa;
+  text-align: left;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.persistent-history-item > svg {
+  flex-shrink: 0;
+}
+
+.persistent-history-item:hover:not(:disabled) {
+  background: #171c28;
+  border-color: #414b64;
+}
+
+.persistent-history-item.selected {
+  background: #1b2232;
+  border-color: #536186;
+  color: #b9c9ff;
+}
+
+.persistent-history-item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.persistent-history-item:focus-visible {
+  outline: 2px solid #b9c9ff;
+  outline-offset: -2px;
+}
+
+.persistent-history-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
+}
+
+.persistent-history-item-text strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: #e2e8f0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.persistent-history-item-text span {
+  font-size: 10px;
+  color: #9299aa;
+}
+
+.persistent-history-empty {
+  padding: 20px;
+  margin: 0;
+  background: #10131b;
+  border: 1px dashed #303541;
+  border-radius: 9px;
+  text-align: center;
+  font-size: 12px;
+  color: #9299aa;
+}
+
+
+/* =========================================
+   STORAGE CONFIRMATION LABELS
+   ========================================= */
+
+.persistent-saved-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 10px;
+  font-weight: 500;
+  color: #4ade80;
+}
+
+.persistent-unsaved-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 10px;
+  font-weight: 500;
+  color: #fbbf24;
+}
+
+
+/* =========================================
+   STORAGE WARNINGS
+   ========================================= */
+
+.persistent-storage-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  margin: 10px 16px;
+  background: rgba(245, 158, 11, 0.07);
+  border: 1px solid rgba(245, 158, 11, 0.22);
+  border-radius: 9px;
+  color: #fbbf24;
+  font-size: 12px;
+  line-height: 1.6;
+  flex-shrink: 0;
+}
+
+.persistent-storage-warning svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+
+/* =========================================
+   RESPONSIVE PERSISTENT CHAT
+   ========================================= */
+
+@media (max-width: 850px) {
+
+  .persistent-chat-toolbar {
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .persistent-chat-actions {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .persistent-history-panel {
+    padding: 14px 16px;
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  .persistent-chat-mode-text span {
+    max-width: 210px;
+  }
+
+  .persistent-chat-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .persistent-save-control {
+    font-size: 11px;
+  }
+
+  .persistent-history-item {
+    padding: 10px 12px;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .persistent-history-panel {
+    animation: none;
+  }
+
+  .persistent-save-control input,
+  .persistent-save-control input::after,
+  .persistent-history-item {
+    transition: none;
+  }
+
+}

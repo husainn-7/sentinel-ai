@@ -8,7 +8,7 @@ import {
   Scan,
   Terminal,
   Activity,
-  History,
+  History as HistoryIcon,
   Settings,
   ArrowUpRight,
   ChevronRight,
@@ -33,6 +33,7 @@ import Assistant from './components/Assistant'
 import Phishing from './components/Phishing'
 import SecurityLogs from './components/SecurityLogs'
 import MLAnomalies from './components/MLAnomalies'
+import History from './components/History'
 
 import './App.css'
 
@@ -50,9 +51,17 @@ const navigation = [
 ]
 
 const systemNavigation = [
-  { name: 'History', icon: History },
+  { name: 'History', icon: HistoryIcon },
   { name: 'Settings', icon: Settings },
 ]
+
+
+// =========================================
+// PERSISTENT CONVERSATION CONFIGURATION
+// =========================================
+
+const ACTIVE_CONVERSATION_KEY =
+  'sentinel-active-conversation'
 
 
 // =========================================
@@ -81,7 +90,7 @@ const metrics = [
   },
   {
     title: 'Automated tests',
-    value: '51/51',
+    value: '136/136',
     description: 'Last verified test run',
     icon: Terminal,
   },
@@ -94,13 +103,58 @@ const metrics = [
 ]
 
 
+// =========================================
+// MAIN APPLICATION
+// =========================================
+
 function App() {
 
   const [activePage, setActivePage] =
     useState('Overview')
 
 
+  // =========================================
+  // RESTORE A SAVED CONVERSATION
+  // =========================================
+
+  function openSavedConversation(
+    conversationId: string
+  ) {
+
+    if (!conversationId.trim()) {
+
+      return
+
+    }
+
+    try {
+
+      localStorage.setItem(
+        ACTIVE_CONVERSATION_KEY,
+        conversationId
+      )
+
+    } catch {
+
+      window.alert(
+        'Browser storage is unavailable. Open the AI Assistant and select the conversation from Saved chats instead.'
+      )
+
+      return
+
+    }
+
+    setActivePage('AI Assistant')
+
+  }
+
+
+  // =========================================
+  // APPLICATION INTERFACE
+  // =========================================
+
   return (
+
     <div className="app-shell">
 
 
@@ -113,17 +167,26 @@ function App() {
         <div className="brand">
 
           <div className="brand-icon">
-            <Shield size={23} strokeWidth={1.8} />
+
+            <Shield
+              size={23}
+              strokeWidth={1.8}
+            />
+
           </div>
 
           <div>
 
             <div className="brand-name">
+
               sentinel<span>.</span>
+
             </div>
 
             <div className="brand-caption">
+
               INTELLIGENCE SYSTEM
+
             </div>
 
           </div>
@@ -136,17 +199,23 @@ function App() {
         <div className="workspace-selector">
 
           <div className="workspace-icon">
+
             <Cpu size={17} />
+
           </div>
 
           <div>
 
             <div className="workspace-name">
+
               Local workspace
+
             </div>
 
             <div className="workspace-caption">
+
               Personal environment
+
             </div>
 
           </div>
@@ -157,7 +226,9 @@ function App() {
         {/* WORKSPACE NAVIGATION */}
 
         <div className="nav-label">
+
           WORKSPACE
+
         </div>
 
         <nav className="navigation">
@@ -166,6 +237,7 @@ function App() {
 
             <button
               key={item.name}
+              type="button"
               aria-label={item.name}
               aria-current={
                 activePage === item.name
@@ -177,7 +249,9 @@ function App() {
                   ? 'active'
                   : ''
               }`}
-              onClick={() => setActivePage(item.name)}
+              onClick={() =>
+                setActivePage(item.name)
+              }
             >
 
               <item.icon
@@ -206,7 +280,9 @@ function App() {
         {/* SYSTEM NAVIGATION */}
 
         <div className="nav-label system-label">
+
           SYSTEM
+
         </div>
 
         <nav className="navigation">
@@ -215,6 +291,7 @@ function App() {
 
             <button
               key={item.name}
+              type="button"
               aria-label={item.name}
               aria-current={
                 activePage === item.name
@@ -226,7 +303,9 @@ function App() {
                   ? 'active'
                   : ''
               }`}
-              onClick={() => setActivePage(item.name)}
+              onClick={() =>
+                setActivePage(item.name)
+              }
             >
 
               <item.icon
@@ -235,6 +314,15 @@ function App() {
               />
 
               <span>{item.name}</span>
+
+              {activePage === item.name && (
+
+                <ChevronRight
+                  size={14}
+                  className="nav-arrow"
+                />
+
+              )}
 
             </button>
 
@@ -254,11 +342,15 @@ function App() {
             <div>
 
               <strong>
+
                 Local-first architecture
+
               </strong>
 
               <p>
+
                 Designed for private processing.
+
               </p>
 
             </div>
@@ -269,7 +361,7 @@ function App() {
 
             SENTINEL AI
 
-            <span>v0.6-dev</span>
+            <span>v0.7-dev</span>
 
           </div>
 
@@ -321,16 +413,22 @@ function App() {
             <section className="page-heading">
 
               <div className="eyebrow">
+
                 INTELLIGENCE OVERVIEW
+
               </div>
 
               <h1>
+
                 Security intelligence<span>.</span>
+
               </h1>
 
               <p>
+
                 Your private workspace for threat detection,
                 investigation and AI-powered security analysis.
+
               </p>
 
               <div className="model-label">
@@ -371,11 +469,15 @@ function App() {
                   </div>
 
                   <div className="metric-value">
+
                     {metric.value}
+
                   </div>
 
                   <div className="metric-description">
+
                     {metric.description}
+
                   </div>
 
                 </div>
@@ -394,21 +496,30 @@ function App() {
                 <div>
 
                   <div className="eyebrow">
+
                     MODEL EVALUATION
+
                   </div>
 
                   <h2>
+
                     Detection performance
+
                   </h2>
 
                   <p>
-                    Machine learning versus rule-based detection
+
+                    Machine learning versus
+                    rule-based detection
+
                   </p>
 
                 </div>
 
                 <div className="panel-tag">
+
                   Held-out synthetic test
+
                 </div>
 
               </div>
@@ -511,7 +622,8 @@ function App() {
 
                 Evaluated on 1,884 held-out synthetic
                 authentication observations.
-                These results do not establish real-world accuracy.
+                These results do not establish
+                real-world accuracy.
 
               </div>
 
@@ -527,7 +639,9 @@ function App() {
                 <h2>Intelligence tools</h2>
 
                 <span>
+
                   Explore your workspace
+
                 </span>
 
               </div>
@@ -535,33 +649,49 @@ function App() {
               <div className="tools-grid">
 
                 {[
+
                   {
                     title: 'Phishing analysis',
+
                     description:
                       'Inspect suspicious emails and URL indicators.',
+
                     icon: Scan,
+
                     page: 'Phishing Analysis',
                   },
+
                   {
                     title: 'Security logs',
+
                     description:
                       'Investigate authentication events and rapid failures.',
+
                     icon: Terminal,
+
                     page: 'Security Logs',
                   },
+
                   {
                     title: 'ML anomaly detection',
+
                     description:
                       'Identify unusual authentication behaviour.',
+
                     icon: Activity,
+
                     page: 'ML Anomalies',
                   },
+
                 ].map((tool) => (
 
                   <button
                     key={tool.title}
+                    type="button"
                     className="tool-card"
-                    onClick={() => setActivePage(tool.page)}
+                    onClick={() =>
+                      setActivePage(tool.page)
+                    }
                   >
 
                     <div className="tool-card-top">
@@ -607,11 +737,16 @@ function App() {
                 <div>
 
                   <h2>
+
                     Sentinel Assistant
+
                   </h2>
 
                   <p>
-                    Your local cybersecurity intelligence companion.
+
+                    Your local cybersecurity
+                    intelligence companion.
+
                   </p>
 
                 </div>
@@ -619,6 +754,7 @@ function App() {
               </div>
 
               <button
+                type="button"
                 className="assistant-launcher"
                 onClick={() =>
                   setActivePage('AI Assistant')
@@ -626,7 +762,9 @@ function App() {
               >
 
                 <span>
+
                   Start a conversation with Sentinel...
+
                 </span>
 
                 <div className="send-icon">
@@ -645,11 +783,15 @@ function App() {
             <footer className="dashboard-footer">
 
               <span>
+
                 SENTINEL / INTELLIGENCE SYSTEM
+
               </span>
 
               <span>
+
                 Private by design.
+
               </span>
 
             </footer>
@@ -689,10 +831,22 @@ function App() {
           <MLAnomalies />
 
 
+        ) : activePage === 'History' ? (
+
+
+          /* PERSISTENT INTELLIGENCE HISTORY */
+
+          <History
+            onOpenConversation={
+              openSavedConversation
+            }
+          />
+
+
         ) : (
 
 
-          /* TEMPORARY MODULE PAGES */
+          /* SETTINGS PLACEHOLDER */
 
           <div className="placeholder-page">
 
@@ -712,6 +866,7 @@ function App() {
             </p>
 
             <button
+              type="button"
               className="back-button"
               onClick={() =>
                 setActivePage('Overview')
@@ -729,6 +884,7 @@ function App() {
       </main>
 
     </div>
+
   )
 
 }
