@@ -1,25 +1,26 @@
+
 import json
 import ollama
 
-from backend.ai_service import MODEL, SYSTEM_PROMPT
+from backend.ai_service import MODEL, build_chat_messages
 
 
-def stream_chat_response(message):
+# ==============================
+# CONTEXT-AWARE STREAMING SERVICE
+# ==============================
+
+def stream_chat_response(message, history=None):
 
     try:
 
+        messages = build_chat_messages(
+            message,
+            history
+        )
+
         stream = ollama.chat(
             model=MODEL,
-            messages=[
-                {
-                    "role": "system",
-                    "content": SYSTEM_PROMPT
-                },
-                {
-                    "role": "user",
-                    "content": message
-                }
-            ],
+            messages=messages,
             stream=True,
             options={
                 "temperature": 0.3,

@@ -1,3 +1,4 @@
+
 import json
 import ollama
 
@@ -13,6 +14,10 @@ MODEL = "llama3.2:latest"
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 PROMPT_DIR = BASE_DIR / "prompts"
+
+MAX_HISTORY_MESSAGES = 6
+
+MAX_HISTORY_CHARACTERS = 6000
 
 
 # ==============================
@@ -34,6 +39,71 @@ LOG_PROMPT = (
 ANOMALY_PROMPT = (
     PROMPT_DIR / "anomaly_prompt.txt"
 ).read_text(encoding="utf-8")
+
+
+# ==============================
+# CONVERSATION MEMORY BUILDER
+# ==============================
+
+def build_chat_messages(message, history=None):
+
+    messages = [
+        {
+            "role": "system",
+            "content": SYSTEM_PROMPT
+        }
+    ]
+
+    selected_history = []
+
+    total_characters = 0
+
+    if history:
+
+        recent_history = history[-MAX_HISTORY_MESSAGES:]
+
+        for item in reversed(recent_history):
+
+            if hasattr(item, "model_dump"):
+
+                item = item.model_dump()
+
+            role = item.get("role")
+
+            content = item.get("content", "").strip()
+
+            if role not in ("user", "assistant"):
+
+                continue
+
+            if not content:
+
+                continue
+
+            if (
+                total_characters + len(content)
+                > MAX_HISTORY_CHARACTERS
+            ):
+
+                break
+
+            selected_history.append({
+                "role": role,
+                "content": content
+            })
+
+            total_characters += len(content)
+
+    selected_history.reverse()
+
+    messages.extend(selected_history)
+
+    messages.append({
+        "role": "user",
+        "content": message
+    })
+
+    return messages
 
 
 # ==============================
@@ -69,17 +139,26 @@ def generate_ai_response(
 
 
 # ==============================
-# CHAT SERVICE
+# CONTEXT-AWARE CHAT SERVICE
 # ==============================
 
-def chat(message):
+def chat(message, history=None):
 
-    return generate_ai_response(
-        SYSTEM_PROMPT,
+    messages = build_chat_messages(
         message,
-        temperature=0.3,
-        max_tokens=500
+        history
     )
+
+    response = ollama.chat(
+        model=MODEL,
+        messages=messages,
+        options={
+            "temperature": 0.3,
+            "num_predict": 500
+        }
+    )
+
+    return response["message"]["content"]
 
 
 # ==============================

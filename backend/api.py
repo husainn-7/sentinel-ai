@@ -1,3 +1,4 @@
+
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 
@@ -66,7 +67,7 @@ def health_check():
 
 
 # ==============================
-# CHAT ENDPOINT
+# CONTEXT-AWARE CHAT ENDPOINT
 # ==============================
 
 @app.post("/chat", response_model=ChatResponse)
@@ -74,7 +75,10 @@ def chat_endpoint(request: ChatRequest):
 
     try:
 
-        response = chat(request.message)
+        response = chat(
+            request.message,
+            request.history
+        )
 
         return ChatResponse(
             response=response,
@@ -90,14 +94,17 @@ def chat_endpoint(request: ChatRequest):
 
 
 # ==============================
-# STREAMING CHAT ENDPOINT
+# CONTEXT-AWARE STREAMING CHAT
 # ==============================
 
 @app.post("/chat/stream")
 def streaming_chat_endpoint(request: ChatRequest):
 
     return StreamingResponse(
-        stream_chat_response(request.message),
+        stream_chat_response(
+            request.message,
+            request.history
+        ),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",
