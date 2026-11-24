@@ -1,0 +1,9 @@
+{
+    "n_estimators": 200,
+    "contamination": 0.01,
+    "validation_accuracy": 0.9595551061678463,
+    "validation_precision": 0.9252873563218391,
+    "validation_recall": 0.706140350877193,
+    "validation_f1_score": 0.8009950248756219,
+    "validation_false_positive_rate": 0.0074285714285714285
+}
