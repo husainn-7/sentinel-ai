@@ -602,8 +602,6 @@ function History({
 
     const controller = new AbortController()
 
-    setStatisticsError('')
-
     async function loadStatistics() {
 
       try {
@@ -653,10 +651,6 @@ function History({
   useEffect(() => {
 
     const controller = new AbortController()
-
-    setIsLoading(true)
-    setError('')
-    setSearchTruncated(false)
 
     async function loadRecords() {
 
@@ -882,22 +876,12 @@ function History({
   useEffect(() => {
 
     if (!selectedReference) {
-
-      setSelectedRecord(null)
-      setIsDetailLoading(false)
-      setDetailError('')
-
       return
-
     }
 
     const controller = new AbortController()
 
     const reference = selectedReference
-
-    setSelectedRecord(null)
-    setDetailError('')
-    setIsDetailLoading(true)
 
     async function loadDetails() {
 
@@ -1011,6 +995,9 @@ function History({
       } else {
 
         setSelectedReference(null)
+        setSelectedRecord(null)
+        setDetailError('')
+        setIsDetailLoading(false)
 
       }
 
@@ -1043,14 +1030,42 @@ function History({
 // USER CONTROLS
 // =========================================
 
+  function prepareRecordList() {
+    setIsLoading(true)
+    setError('')
+    setSearchTruncated(false)
+  }
+
+  function prepareDetails() {
+    setSelectedRecord(null)
+    setDetailError('')
+    setIsDetailLoading(true)
+  }
+
+  function closeRecord() {
+    setSelectedReference(null)
+    setSelectedRecord(null)
+    setDetailError('')
+    setIsDetailLoading(false)
+  }
+
+  function reloadHistoryData(reloadDetails = true) {
+    setStatisticsError('')
+    prepareRecordList()
+
+    if (reloadDetails && selectedReference) {
+      prepareDetails()
+    }
+
+    setReloadVersion((previous) => previous + 1)
+  }
+
   function refreshHistory() {
 
     setNotice('')
     setOperationError('')
 
-    setReloadVersion(
-      (previous) => previous + 1
-    )
+    reloadHistoryData()
 
   }
 
@@ -1059,11 +1074,21 @@ function History({
     value: HistoryFilter
   ) {
 
+    if (
+      value !== filter ||
+      (
+        value !== 'investigations' &&
+        investigationFilter !== 'all'
+      )
+    ) {
+      prepareRecordList()
+    }
+
     setFilter(value)
 
     setPage(0)
 
-    setSelectedReference(null)
+    closeRecord()
 
     if (value !== 'investigations') {
 
@@ -1078,19 +1103,29 @@ function History({
 
     setPage(0)
 
-    setSelectedReference(null)
+    closeRecord()
 
-    setQuery(searchInput.trim())
+    const nextQuery = searchInput.trim()
+
+    if (nextQuery !== query) {
+      prepareRecordList()
+    }
+
+    setQuery(nextQuery)
 
   }
 
 
   function clearSearch() {
 
+    if (query !== '') {
+      prepareRecordList()
+    }
+
     setSearchInput('')
     setQuery('')
     setPage(0)
-    setSelectedReference(null)
+    closeRecord()
 
   }
 
@@ -1098,6 +1133,8 @@ function History({
   function viewRecord(
     record: HistoryRecord
   ) {
+
+    prepareDetails()
 
     setSelectedReference({
 
@@ -1196,9 +1233,7 @@ function History({
         'Record renamed successfully.'
       )
 
-      setReloadVersion(
-        (previous) => previous + 1
-      )
+      reloadHistoryData()
 
     } catch (exception) {
 
@@ -1273,13 +1308,13 @@ function History({
       }
 
 
-      if (
-        selectedReference?.id ===
-          target.data.id &&
+      const deletedSelectedRecord =
+        selectedReference?.id === target.data.id &&
         selectedReference.kind === target.kind
-      ) {
 
-        setSelectedReference(null)
+      if (deletedSelectedRecord) {
+
+        closeRecord()
 
       }
 
@@ -1289,9 +1324,7 @@ function History({
         'Record deleted successfully.'
       )
 
-      setReloadVersion(
-        (previous) => previous + 1
-      )
+      reloadHistoryData(!deletedSelectedRecord)
 
     } catch (exception) {
 
@@ -1735,14 +1768,18 @@ function History({
               disabled={isMutating}
               onChange={(event) => {
 
-                setInvestigationFilter(
-                  event.target.value as
-                    InvestigationFilter
-                )
+                const nextFilter =
+                  event.target.value as InvestigationFilter
+
+                if (nextFilter !== investigationFilter) {
+                  prepareRecordList()
+                }
+
+                setInvestigationFilter(nextFilter)
 
                 setPage(0)
 
-                setSelectedReference(null)
+                closeRecord()
 
               }}
             >
@@ -2251,7 +2288,7 @@ function History({
               className="history-icon-button"
               aria-label="Close record details"
               onClick={() =>
-                setSelectedReference(null)
+                closeRecord()
               }
             >
 

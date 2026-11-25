@@ -8,7 +8,7 @@ from pathlib import Path
 
 APP_NAME = "Sentinel AI"
 
-APP_VERSION = "0.9.0"
+APP_VERSION = "1.0.0"
 
 APP_DESCRIPTION = (
     "Local AI-powered cybersecurity intelligence "

@@ -300,7 +300,7 @@ const metrics = [
   },
   {
     title: 'Automated tests',
-    value: '173/173',
+    value: '226/226',
     description: 'Last verified test run',
     icon: Terminal,
   },
@@ -620,7 +620,7 @@ function App() {
 
             SENTINEL AI
 
-            <span>v0.9</span>
+            <span>v1.0</span>
 
           </div>
 
