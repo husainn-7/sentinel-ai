@@ -10,6 +10,10 @@ from backend.config import (
     APP_DESCRIPTION,
 )
 
+from backend.security_middleware import (
+    SecurityMiddleware,
+)
+
 from backend.schemas import (
     ChatRequest,
     ChatResponse,
@@ -97,6 +101,15 @@ app = FastAPI(
     description=APP_DESCRIPTION,
     version=APP_VERSION,
     lifespan=lifespan,
+)
+
+
+# =========================================
+# APPLICATION SECURITY
+# =========================================
+
+app.add_middleware(
+    SecurityMiddleware
 )
 
 
@@ -276,7 +289,7 @@ def chat_stream_endpoint(
         response_stream,
         media_type="text/event-stream",
         headers={
-            "Cache-Control": "no-cache",
+            "Cache-Control": "no-store",
             "X-Accel-Buffering": "no",
         },
     )

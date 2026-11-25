@@ -8,7 +8,7 @@ from typing import Any
 from backend.schemas import ChatRequest
 
 from database.conversations import (
-    create_conversation,
+    create_conversation_with_turn,
     get_conversation,
     get_recent_context,
     save_chat_turn,
@@ -77,9 +77,7 @@ def prepare_chat_session(
 
     )
 
-
-    # Temporary conversations use the history
-    # supplied by the frontend.
+    # Temporary conversations use frontend context.
     # Nothing is written to SQLite.
 
     if not request.save_history:
@@ -112,7 +110,6 @@ def prepare_chat_session(
             db_path=db_path,
 
         )
-
 
     # Persistent conversations use SQLite
     # as the authoritative source of context.
@@ -149,14 +146,11 @@ def prepare_chat_session(
 
     else:
 
-        # A new persistent conversation starts
-        # with no previous saved messages.
-        #
-        # The database record is created only
-        # after a complete response is generated.
+        # New persistent conversations start empty.
+        # No database record is created until
+        # a complete AI response is available.
 
         history = []
-
 
     return ChatSession(
 
@@ -209,10 +203,14 @@ def complete_chat_session(
 
         return build_storage_metadata()
 
+    # Reject incomplete or empty responses.
 
     if (
+
         not isinstance(assistant_response, str)
+
         or not assistant_response.strip()
+
     ):
 
         return build_storage_metadata(
@@ -222,46 +220,65 @@ def complete_chat_session(
             history_saved=False,
 
             storage_warning=(
+
                 "Empty assistant responses "
                 "cannot be saved."
+
             ),
 
         )
 
-
     conversation_id = session.conversation_id
-
 
     try:
 
-        # Create a database record only when
-        # the first complete response exists.
+        # =================================
+        # NEW PERSISTENT CONVERSATION
+        # =================================
 
         if conversation_id is None:
 
-            conversation = create_conversation(
+            # Create the conversation and save
+            # both messages in one transaction.
 
-                db_path=session.db_path
+            result = create_conversation_with_turn(
+
+                user_message=session.message,
+
+                assistant_message=assistant_response,
+
+                db_path=session.db_path,
 
             )
 
-            conversation_id = conversation["id"]
+            # The ID is assigned only after
+            # the transaction succeeds.
 
+            conversation_id = result["conversation_id"]
 
-        # Save the user message and assistant
-        # response together in one transaction.
+        # =================================
+        # EXISTING PERSISTENT CONVERSATION
+        # =================================
 
-        save_chat_turn(
+        else:
 
-            conversation_id=conversation_id,
+            # Save both messages atomically
+            # within the existing conversation.
 
-            user_message=session.message,
+            save_chat_turn(
 
-            assistant_message=assistant_response,
+                conversation_id=conversation_id,
 
-            db_path=session.db_path,
+                user_message=session.message,
 
-        )
+                assistant_message=assistant_response,
+
+                db_path=session.db_path,
+
+            )
+
+        # Update the session only after
+        # successful database storage.
 
         session.conversation_id = conversation_id
 
@@ -273,12 +290,10 @@ def complete_chat_session(
 
         )
 
-
     except Exception as exception:
 
         # Log only the exception type.
-        # Do not log potentially sensitive
-        # conversation content.
+        # Never log sensitive conversation content.
 
         logger.warning(
 
@@ -288,9 +303,12 @@ def complete_chat_session(
 
         )
 
+        # A failed new conversation must not
+        # return an uncommitted conversation ID.
+
         return build_storage_metadata(
 
-            conversation_id=conversation_id,
+            conversation_id=session.conversation_id,
 
             history_saved=False,
 

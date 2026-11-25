@@ -810,3 +810,93 @@ def get_conversation_statistics(
             assistant_messages,
 
     }
+
+# =========================================
+# ATOMIC CONVERSATION CREATION
+# =========================================
+
+def create_conversation_with_turn(
+    user_message,
+    assistant_message,
+    title="New conversation",
+    db_path=None,
+):
+
+    # Validate all inputs before opening a transaction.
+
+    user_message = normalize_message(
+        user_message
+    )
+
+    assistant_message = normalize_message(
+        assistant_message
+    )
+
+    title = normalize_title(title)
+
+    if title == "New conversation":
+
+        title = normalize_title(
+            user_message
+        )
+
+    conversation_id = str(uuid4())
+
+    # Create the conversation and both messages
+    # inside a single atomic transaction.
+
+    with get_connection(db_path) as connection:
+
+        connection.execute(
+            "BEGIN IMMEDIATE"
+        )
+
+        connection.execute("""
+            INSERT INTO conversations (
+                id,
+                title
+            )
+            VALUES (?, ?)
+        """, (
+            conversation_id,
+            title,
+        ))
+
+        connection.executemany("""
+            INSERT INTO messages (
+                conversation_id,
+                role,
+                content
+            )
+            VALUES (?, ?, ?)
+        """, [
+            (
+                conversation_id,
+                "user",
+                user_message,
+            ),
+            (
+                conversation_id,
+                "assistant",
+                assistant_message,
+            ),
+        ])
+
+        connection.execute("""
+            UPDATE conversations
+
+            SET updated_at = strftime(
+                '%Y-%m-%dT%H:%M:%fZ',
+                'now'
+            )
+
+            WHERE id = ?
+        """, (
+            conversation_id,
+        ))
+
+    return {
+        "conversation_id": conversation_id,
+        "title": title,
+        "messages_saved": 2,
+    }

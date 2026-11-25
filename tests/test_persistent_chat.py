@@ -896,7 +896,7 @@ class TestPersistentChatAPI(
             get_database_path
         ] = lambda: self.db_path
 
-        self.client = TestClient(app)
+        self.client = TestClient(app, base_url="http://127.0.0.1:8000")
 
         self.client.__enter__()
 

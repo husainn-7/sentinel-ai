@@ -13,7 +13,7 @@ from backend.ai_service import (
 )
 
 
-client = TestClient(app)
+client = TestClient(app, base_url="http://127.0.0.1:8000")
 
 
 class TestSentinelAPI(unittest.TestCase):
@@ -242,7 +242,10 @@ class TestSentinelAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 422)
 
 
+
     def test_memory_message_order(self):
+
+        from backend.ai_service import CHAT_SECURITY_POLICY
 
         history = [
             {
@@ -261,11 +264,15 @@ class TestSentinelAPI(unittest.TestCase):
         )
 
         self.assertEqual(
-            messages[0],
-            {
-                "role": "system",
-                "content": SYSTEM_PROMPT
-            }
+            messages[0]["role"],
+            "system"
+        )
+
+        self.assertEqual(
+            messages[0]["content"],
+            SYSTEM_PROMPT.strip()
+            + "\n\n"
+            + CHAT_SECURITY_POLICY
         )
 
         self.assertEqual(
@@ -280,6 +287,7 @@ class TestSentinelAPI(unittest.TestCase):
                 "content": "What is my favourite colour?"
             }
         )
+
 
 
     def test_memory_character_budget(self):

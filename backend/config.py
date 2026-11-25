@@ -8,7 +8,7 @@ from pathlib import Path
 
 APP_NAME = "Sentinel AI"
 
-APP_VERSION = "0.8.0"
+APP_VERSION = "0.9.0"
 
 APP_DESCRIPTION = (
     "Local AI-powered cybersecurity intelligence "
@@ -69,6 +69,46 @@ ML_FEATURES = (
 API_HOST = "127.0.0.1"
 
 API_PORT = 8000
+
+
+# =========================================
+# SECURITY CONFIGURATION
+# =========================================
+
+MAX_REQUEST_BODY_BYTES = 1024 * 1024
+
+TRUSTED_HOSTS = (
+    "localhost",
+    "127.0.0.1",
+    "[::1]",
+)
+
+TRUSTED_ORIGINS = (
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:4173",
+    "http://127.0.0.1:4173",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+)
+
+STATE_CHANGING_METHODS = (
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+)
+
+SECURITY_HEADERS = {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "no-referrer",
+    "Permissions-Policy": (
+        "camera=(), microphone=(), geolocation=()"
+    ),
+    "Cross-Origin-Resource-Policy": "same-origin",
+    "Cache-Control": "no-store",
+}
 
 
 # =========================================
