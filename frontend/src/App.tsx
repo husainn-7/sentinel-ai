@@ -9,7 +9,7 @@ import {
   Terminal,
   Activity,
   History as HistoryIcon,
-  Settings,
+  Settings as SettingsIcon,
   ArrowUpRight,
   ChevronRight,
   Cpu,
@@ -34,6 +34,7 @@ import Phishing from './components/Phishing'
 import SecurityLogs from './components/SecurityLogs'
 import MLAnomalies from './components/MLAnomalies'
 import History from './components/History'
+import Settings from './components/Settings'
 
 import './App.css'
 
@@ -52,7 +53,7 @@ const navigation = [
 
 const systemNavigation = [
   { name: 'History', icon: HistoryIcon },
-  { name: 'Settings', icon: Settings },
+  { name: 'Settings', icon: SettingsIcon },
 ]
 
 
@@ -90,7 +91,7 @@ const metrics = [
   },
   {
     title: 'Automated tests',
-    value: '136/136',
+    value: '173/173',
     description: 'Last verified test run',
     icon: Terminal,
   },
@@ -122,9 +123,7 @@ function App() {
   ) {
 
     if (!conversationId.trim()) {
-
       return
-
     }
 
     try {
@@ -361,7 +360,7 @@ function App() {
 
             SENTINEL AI
 
-            <span>v0.7-dev</span>
+            <span>v0.8</span>
 
           </div>
 
@@ -843,10 +842,18 @@ function App() {
           />
 
 
+        ) : activePage === 'Settings' ? (
+
+
+          /* SYSTEM MANAGEMENT MODULE */
+
+          <Settings />
+
+
         ) : (
 
 
-          /* SETTINGS PLACEHOLDER */
+          /* UNKNOWN PAGE FALLBACK */
 
           <div className="placeholder-page">
 
@@ -856,12 +863,11 @@ function App() {
 
             </div>
 
-            <h1>{activePage}</h1>
+            <h1>Page unavailable</h1>
 
             <p>
 
-              This module will be connected in the
-              next development stages.
+              The requested workspace could not be found.
 
             </p>
 
